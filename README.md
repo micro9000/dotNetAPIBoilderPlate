@@ -11,3 +11,16 @@
 - Dapper.Contrib code: https://github.com/StackExchange/Dapper/blob/main/Dapper.Contrib/SqlMapperExtensions.cs
 - https://github.com/MiniProfiler/dotnet/issues/290
 - https://stackoverflow.com/questions/50581540/dapper-contrib-and-miniprofiler-for-mysql-integration-issues?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+- See appsettings.js
+```
+"DatabaseSettings": {
+    "Main": {
+      "ConnectionString": "Server=127.0.0.1; Port=3306;Database=APINETCORESample;User Id=root;password=;Persist Security Info=True;Allow Zero Datetime=True;CharSet=utf8;",
+      "Adapter": "mysqlconnection"
+    },
+	"OtherDBServer": {
+      "ConnectionString": "",
+      "Adapter": "mysqlconnection" // list: API-DataAccess/SettingModel/Enums.Adapter
+    }
+},
+```
