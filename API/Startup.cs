@@ -20,14 +20,15 @@ using API.SettingModel;
 using System.Text;
 using API.Services;
 using API_DataAccess.SettingModel;
+using API_DataAccess.DataAccess.Contracts;
 
 namespace API
 {
     public class Startup
     {
         // https: //andrewlock.net/ihostingenvironment-vs-ihost-environment-obsolete-types-in-net-core-3/
-        //IWebHostEnvironment 
-        public Startup(IHostEnvironment env)
+        //IWebHostEnvironment IHostEnvironment
+        public Startup(IWebHostEnvironment env)
         {
             //Configuration = configuration;
             Configuration = new ConfigurationBuilder()
@@ -73,6 +74,7 @@ namespace API
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+            services.AddScoped<IRoleData, RoleData>();
             services.AddScoped<IUserData, UserData>();
             services.AddScoped<IUserRefreshTokenData, UserRefreshTokenData>();
             services.AddScoped<IUserAuthService, UserAuthService>();

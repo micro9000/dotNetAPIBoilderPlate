@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using API_DataAccess.SettingModel;
+using API_DataAccess.DataAccess.Contracts;
 
 namespace API_DataAccess.DataAccess.Core
 {
@@ -18,12 +19,14 @@ namespace API_DataAccess.DataAccess.Core
         private DatabaseSettings _settings;
         private string _connectionString;
         private Enums.Adapter _dbAdapter;
+        private readonly IUserData _userData;
 
-        public UserRefreshTokenData(IOptions<DatabaseSettings> dbOptions) : base(dbOptions)
+        public UserRefreshTokenData(IOptions<DatabaseSettings> dbOptions, IUserData userData) : base(dbOptions)
         {
             this._settings = dbOptions.Value;
             this._connectionString = this._settings.Main.ConnectionString;
             this._dbAdapter = this._settings.Main.Adapter;
+            _userData = userData;
         }
 
 
@@ -40,6 +43,13 @@ namespace API_DataAccess.DataAccess.Core
                 var tokens = conn.Query<UserRefreshToken, User, UserRefreshToken>(query,
                         (URT, U) =>
                         {
+                            var roles = _userData.GetRoles(U.Id);
+
+                            foreach(var role in roles)
+                            {
+                                U.Roles.Add(role);
+                            }
+
                             URT.UserData = U;
                             return URT;
                         }, new

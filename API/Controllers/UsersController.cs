@@ -1,5 +1,6 @@
 ﻿using API.DTO.User;
 using API.Services;
+using API_DataAccess.DataAccess.Contracts;
 using API_DataAccess.DataAccess.Core;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -81,8 +82,9 @@ namespace API.Controllers
         }
 
 
-        [HttpGet("getall")]
-        public ActionResult<IEnumerable<ReadUserDTO>> GetAll()
+        [HttpGet]
+        [Authorize(Roles = "admin")]
+        public ActionResult<IEnumerable<ReadUserDTO>> Get()
         {
             var users = _userData.GetAll_exclude_deleted();
 
@@ -93,6 +95,11 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public ActionResult<ReadUserDTO> GetById(int id)
         {
+            // only allow admins to access other user records
+            var currentUserId = int.Parse(User.Identity.Name);
+            if (id != currentUserId && !User.IsInRole("admin"))
+                return Forbid();
+
             var user = _userData.Get(id);
 
             var userDTO = _mapper.Map<ReadUserBaseDTO>(user);

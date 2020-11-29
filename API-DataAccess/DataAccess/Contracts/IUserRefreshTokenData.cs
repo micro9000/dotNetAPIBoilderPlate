@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace API_DataAccess.DataAccess.Core
+namespace API_DataAccess.DataAccess.Contracts
 {
     public interface IUserRefreshTokenData : IRepository<UserRefreshToken>
     {

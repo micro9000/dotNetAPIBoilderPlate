@@ -10,7 +10,7 @@ namespace API_DataAccess.DataAccess.Internal
 {
     public interface IRepository<TEntity> where TEntity : class
     {
-		TEntity Get(int id);
+		TEntity Get(long id);
 		List<TEntity> GetAll();
 		//List<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
 

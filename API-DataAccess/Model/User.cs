@@ -1,5 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 using System;
+using System.Collections.Generic;
 
 namespace API_DataAccess.Model
 {
@@ -76,9 +77,18 @@ namespace API_DataAccess.Model
 
         public int IsDeleted { get; set; }
 
-        //[Write(false)]
-        //[Computed]
-        //public string Projects { get; set; }
+
+        private List<Role> roles = new List<Role>();
+
+
+        [Write(false)]
+        [Computed]
+        public List<Role> Roles
+        {
+            get { return roles; }
+            set { roles = value; }
+        }
+
 
     }
 }

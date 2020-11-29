@@ -1,5 +1,6 @@
 ﻿using API.DTO.User;
 using API.SettingModel;
+using API_DataAccess.DataAccess.Contracts;
 using API_DataAccess.DataAccess.Core;
 using API_DataAccess.Model;
 using AutoMapper;
@@ -100,16 +101,28 @@ namespace API.Services
 
         // helper methods
 
+        private Claim[] GetUserClaims (User user)
+        {
+            List<Claim> claims = new List<Claim>();
+            claims.Add(new Claim(ClaimTypes.Name, user.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.Email, user.Email));
+
+            foreach (var role in user.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.RoleKey));
+            }
+
+            return claims.ToArray();
+        }
+
         private string generateJwtToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_authenticationSettings.Secret);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
-                }),
+                Subject = new ClaimsIdentity(this.GetUserClaims(user)),
                 Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };

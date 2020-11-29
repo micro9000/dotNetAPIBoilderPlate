@@ -78,7 +78,7 @@ namespace API_DataAccess.DataAccess.Internal
         //    throw new NotImplementedException();
         //}
 
-        public TEntity Get(int id)
+        public TEntity Get(long id)
         {
             TEntity res;
             using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))

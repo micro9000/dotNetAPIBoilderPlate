@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using API_DataAccess.SettingModel;
+using API_DataAccess.DataAccess.Contracts;
 
 namespace API_DataAccess.DataAccess.Core
 {
@@ -42,6 +43,16 @@ namespace API_DataAccess.DataAccess.Core
                 conn.Close();
             }
 
+            if (results != null)
+            {
+                var roles = this.GetRoles(results.Id);
+
+                foreach(var role in roles)
+                {
+                    results.Roles.Add(role);
+                }
+            }
+
             return results;
         }
 
@@ -61,5 +72,30 @@ namespace API_DataAccess.DataAccess.Core
 
             return results;
         }
+
+
+        public List<Role> GetRoles(long userId)
+        {
+            List<Role> roles = new List<Role>();
+
+            string query = @"SELECT R.*
+                            FROM UserRoles AS UR
+                            JOIN Users AS U ON UR.userId=U.id
+                            JOIN Roles AS R ON UR.roleId=R.id
+                            WHERE UR.isDeleted=0 AND R.isDeleted=0 AND UR.userID=@UserId";
+
+            using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
+            {
+                roles = conn.Query<Role>(query, new { UserId = userId }).ToList();
+
+                conn.Close();
+            }
+
+            return roles;
+        }
+
+
+
+
     }
 }
