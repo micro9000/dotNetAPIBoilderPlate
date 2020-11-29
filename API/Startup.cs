@@ -45,6 +45,7 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<DatabaseSettings>(Configuration.GetSection("DatabaseSettings"));
+            services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
             var authenticationSettingsSection = Configuration.GetSection(nameof(AuthenticationSettings));
             services.Configure<AuthenticationSettings>(authenticationSettingsSection);
             services.AddOptions();
