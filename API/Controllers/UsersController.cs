@@ -88,7 +88,7 @@ namespace API.Controllers
         {
             var users = _userData.GetAll_exclude_deleted();
 
-            var usersDTO = _mapper.Map<IEnumerable<ReadUserBaseDTO>>(users);
+            var usersDTO = _mapper.Map<IEnumerable<UserBaseDTO>>(users);
             return Ok(usersDTO);
         }
 
@@ -102,7 +102,7 @@ namespace API.Controllers
 
             var user = _userData.Get(id);
 
-            var userDTO = _mapper.Map<ReadUserBaseDTO>(user);
+            var userDTO = _mapper.Map<UserBaseDTO>(user);
             return Ok(userDTO);
         }
 

@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace API.DTO.User
 {
-    public class ReadUserDTO : ReadUserBaseDTO
+    public class ReadUserDTO : UserBaseDTO
     {
         public string JwtToken { get; set; }
 

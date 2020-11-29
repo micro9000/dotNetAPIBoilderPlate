@@ -27,7 +27,33 @@ namespace API_DataAccess.Model
         [Computed]
         public bool IsActive => Revoked == null && !IsExpired;
 
-        public int IsDeleted { get; set; }
+
+        private DateTime createdAt = DateTime.UtcNow;
+
+        public DateTime CreatedAt
+        {
+            get { return createdAt; }
+            set { createdAt = value; }
+        }
+
+        private DateTime updatedAt;
+
+        public DateTime UpdatedAt
+        {
+            get { return updatedAt; }
+            set { updatedAt = value; }
+        }
+
+        public DateTime? DeletedAt
+        {
+            get; set;
+        }
+
+
+        [Write(false)]
+        [Computed]
+        public bool IsDeleted => this.DeletedAt != null;
+
 
         [Write(false)]
         [Computed]

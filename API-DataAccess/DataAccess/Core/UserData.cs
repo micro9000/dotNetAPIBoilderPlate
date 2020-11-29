@@ -30,7 +30,7 @@ namespace API_DataAccess.DataAccess.Core
         public User Login(string userName, string password)
         {
             User results = new User();
-            string query = "SELECT * FROM Users WHERE isDeleted=0 AND userName=@Username AND password=@Password";
+            string query = "SELECT * FROM Users WHERE deletedAt IS NULL AND userName=@Username AND password=@Password";
 
             using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
             {
@@ -61,7 +61,7 @@ namespace API_DataAccess.DataAccess.Core
         {
             List<User> results = new List<User>();
 
-            string query = @"SELECT * FROM Users WHERE isDeleted=0";
+            string query = @"SELECT * FROM Users WHERE deletedAt IS NULL";
 
             using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
             {
@@ -82,7 +82,7 @@ namespace API_DataAccess.DataAccess.Core
                             FROM UserRoles AS UR
                             JOIN Users AS U ON UR.userId=U.id
                             JOIN Roles AS R ON UR.roleId=R.id
-                            WHERE UR.isDeleted=0 AND R.isDeleted=0 AND UR.userID=@UserId";
+                            WHERE UR.deletedAt IS NULL AND R.deletedAt IS NULL AND UR.userID=@UserId";
 
             using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
             {

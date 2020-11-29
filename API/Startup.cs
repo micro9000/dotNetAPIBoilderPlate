@@ -21,6 +21,7 @@ using System.Text;
 using API.Services;
 using API_DataAccess.SettingModel;
 using API_DataAccess.DataAccess.Contracts;
+using EmailService;
 
 namespace API
 {
@@ -75,6 +76,7 @@ namespace API
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+            services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IRoleData, RoleData>();
             services.AddScoped<IUserData, UserData>();
             services.AddScoped<IUserRefreshTokenData, UserRefreshTokenData>();

@@ -42,16 +42,24 @@ namespace API_DataAccess.Model
             set { createdAt = value; }
         }
 
-        private DateTime deletedAt = DateTime.UtcNow;
+        private DateTime updatedAt;
 
-        public DateTime DeletedAt
+        public DateTime UpdatedAt
         {
-            get { return deletedAt; }
-            set { deletedAt = value; }
+            get { return updatedAt; }
+            set { updatedAt = value; }
+        }
+
+        public DateTime? DeletedAt
+        {
+            get; set;
         }
 
 
-        public int IsDeleted { get; set; }
+        [Write(false)]
+        [Computed]
+        public bool IsDeleted => this.DeletedAt != null;
+
 
     }
 }

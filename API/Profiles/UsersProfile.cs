@@ -9,7 +9,7 @@ namespace API.Profiles
         public UsersProfile()
         {
             CreateMap<User, ReadUserDTO>();
-            CreateMap<User, ReadUserBaseDTO>();
+            CreateMap<User, UserBaseDTO>();
             CreateMap<UserRefreshToken, UserRefreshTokenDTO>();
         }
     }

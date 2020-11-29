@@ -30,7 +30,7 @@ namespace API_DataAccess.DataAccess.Core
         {
             List<Role> results = new List<Role>();
 
-            string query = @"SELECT * FROM Roles WHERE isDeleted=0";
+            string query = @"SELECT * FROM Roles WHERE deletedAt IS NULL";
 
             using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
             {

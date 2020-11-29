@@ -58,7 +58,7 @@ namespace API_DataAccess.Model
             set { createdAt = value; }
         }
 
-        private DateTime updatedAt = DateTime.UtcNow;
+        private DateTime updatedAt;
 
         public DateTime UpdatedAt
         {
@@ -66,20 +66,18 @@ namespace API_DataAccess.Model
             set { updatedAt = value; }
         }
 
-        private DateTime deletedAt = DateTime.UtcNow;
-
-        public DateTime DeletedAt
+        public DateTime? DeletedAt
         {
-            get { return deletedAt; }
-            set { deletedAt = value; }
+            get;set;
         }
 
 
-        public int IsDeleted { get; set; }
+        [Write(false)]
+        [Computed]
+        public bool IsDeleted => this.DeletedAt != null;
 
 
         private List<Role> roles = new List<Role>();
-
 
         [Write(false)]
         [Computed]
@@ -88,7 +86,5 @@ namespace API_DataAccess.Model
             get { return roles; }
             set { roles = value; }
         }
-
-
     }
 }

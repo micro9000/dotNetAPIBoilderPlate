@@ -36,7 +36,7 @@ namespace API_DataAccess.DataAccess.Core
 
             string query = @"SELECT * FROM UserRefreshTokens AS URT
                              INNER JOIN Users AS U ON U.id = URT.userId
-                             WHERE U.isDeleted = 0 AND URT.isDeleted=0 AND URT.token = @Token";
+                             WHERE U.deletedAt IS NULL AND URT.deletedAt IS NULL AND URT.token = @Token";
 
             using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
             {
@@ -70,7 +70,7 @@ namespace API_DataAccess.DataAccess.Core
         {
             List< UserRefreshToken> results = new List<UserRefreshToken>();
 
-            string query = @"SELECT * FROM UserRefreshTokens WHERE userId=@UserId";
+            string query = @"SELECT * FROM UserRefreshTokens WHERE deletedAt IS NULL AND userId=@UserId";
 
             using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
             {
