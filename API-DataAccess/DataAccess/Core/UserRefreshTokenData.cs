@@ -36,18 +36,21 @@ namespace API_DataAccess.DataAccess.Core
 
             string query = @"SELECT * FROM UserRefreshTokens AS URT
                              INNER JOIN Users AS U ON U.id = URT.userId
-                             WHERE U.deletedAt IS NULL AND URT.deletedAt IS NULL AND URT.token = @Token";
+                             WHERE U.isDeleted=false AND URT.isDeleted=false AND URT.token = @Token";
 
-            using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
+            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
             {
                 var tokens = conn.Query<UserRefreshToken, User, UserRefreshToken>(query,
                         (URT, U) =>
                         {
-                            var roles = _userData.GetRoles(U.Id);
-
-                            foreach(var role in roles)
+                            if (U != null)
                             {
-                                U.Roles.Add(role);
+                                var roles = _userData.GetRoles(U.Id);
+
+                                foreach (var role in roles)
+                                {
+                                    U.Roles.Add(role);
+                                }
                             }
 
                             URT.UserData = U;
@@ -70,9 +73,9 @@ namespace API_DataAccess.DataAccess.Core
         {
             List< UserRefreshToken> results = new List<UserRefreshToken>();
 
-            string query = @"SELECT * FROM UserRefreshTokens WHERE deletedAt IS NULL AND userId=@UserId";
+            string query = @"SELECT * FROM UserRefreshTokens WHERE isDeleted=false AND userId=@UserId";
 
-            using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
+            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
             {
                 var tokens = conn.Query<UserRefreshToken>(query, new
                         {

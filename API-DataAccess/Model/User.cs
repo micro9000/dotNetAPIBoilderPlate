@@ -50,6 +50,58 @@ namespace API_DataAccess.Model
         }
 
 
+        private bool acceptTerms;
+
+        public bool AcceptTerms
+        {
+            get { return acceptTerms; }
+            set { acceptTerms = value; }
+        }
+
+
+        private string verificationToken;
+
+        public string VerificationToken
+        {
+            get { return verificationToken; }
+            set { verificationToken = value; }
+        }
+
+        private bool isVerified;
+
+        public bool IsVerified
+        {
+            get { return isVerified; }
+            set { isVerified = value; }
+        }
+
+        private string resetToken;
+
+        public string ResetToken
+        {
+            get { return resetToken; }
+            set { resetToken = value; }
+        }
+
+
+        private DateTime resetTokenExpiresAt;
+
+        public DateTime ResetTokenExpiresAt
+        {
+            get { return resetTokenExpiresAt; }
+            set { resetTokenExpiresAt = value; }
+        }
+
+        private DateTime passwordResetAt;
+
+        public DateTime PasswordResetAt
+        {
+            get { return passwordResetAt; }
+            set { passwordResetAt = value; }
+        }
+
+
+
         private DateTime createdAt = DateTime.UtcNow;
 
         public DateTime CreatedAt
@@ -58,7 +110,7 @@ namespace API_DataAccess.Model
             set { createdAt = value; }
         }
 
-        private DateTime updatedAt;
+        private DateTime updatedAt = DateTime.UtcNow;
 
         public DateTime UpdatedAt
         {
@@ -66,15 +118,22 @@ namespace API_DataAccess.Model
             set { updatedAt = value; }
         }
 
-        public DateTime? DeletedAt
+        private DateTime deletedAt = DateTime.MinValue;
+
+        public DateTime DeletedAt
         {
-            get;set;
+            get { return deletedAt; }
+            set { deletedAt = value; }
         }
 
 
-        [Write(false)]
-        [Computed]
-        public bool IsDeleted => this.DeletedAt != null;
+        private bool isDeleted;
+
+        public bool IsDeleted
+        {
+            get { return isDeleted; }
+            set { isDeleted = value; }
+        }
 
 
         private List<Role> roles = new List<Role>();

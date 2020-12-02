@@ -22,6 +22,7 @@ using API.Services;
 using API_DataAccess.SettingModel;
 using API_DataAccess.DataAccess.Contracts;
 using EmailService;
+using API.Middleware;
 
 namespace API
 {
@@ -113,6 +114,11 @@ namespace API
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials());
+
+
+            app.UseMiddleware<ErrorHandlerMiddleware>();
+            app.UseMiddleware<JwtMiddleware>();
+
 
             app.UseAuthentication();
             app.UseAuthorization();

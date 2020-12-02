@@ -50,15 +50,22 @@ namespace API_DataAccess.Model
             set { updatedAt = value; }
         }
 
-        public DateTime? DeletedAt
+        private DateTime deletedAt = DateTime.MinValue;
+
+        public DateTime DeletedAt
         {
-            get; set;
+            get { return deletedAt; }
+            set { deletedAt = value; }
         }
 
 
-        [Write(false)]
-        [Computed]
-        public bool IsDeleted => this.DeletedAt != null;
+        private bool isDeleted;
+
+        public bool IsDeleted
+        {
+            get { return isDeleted; }
+            set { isDeleted = value; }
+        }
 
 
     }

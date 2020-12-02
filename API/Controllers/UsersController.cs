@@ -2,6 +2,7 @@
 using API.Services;
 using API_DataAccess.DataAccess.Contracts;
 using API_DataAccess.DataAccess.Core;
+using API_DataAccess.Model;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -11,13 +12,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace API.Controllers
 {
-    [Authorize]
     [Route("api/users")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController : BaseController
     {
         private readonly ILogger<UsersController> _log;
         private readonly IMapper _mapper;
@@ -35,7 +36,6 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
-        [AllowAnonymous]
         [HttpPost("authenticate")]
         public ActionResult<ReadUserDTO> Authenticate([FromBody] LoginDTO loginDTO)
         {
@@ -49,8 +49,6 @@ namespace API.Controllers
             return Ok(response);
         }
 
-
-        [AllowAnonymous]
         [HttpPost("refresh-token")]
         public ActionResult<ReadUserDTO> RefreshToken()
         {
@@ -64,11 +62,11 @@ namespace API.Controllers
             return Ok(response);
         }
 
-
+        [Authorize]
         [HttpPost("revoke-token")]
         public ActionResult RevokeToken([FromBody] RevokeTokenRequestDTO revokeTokenInput)
         {
-            var token = revokeTokenInput.Token ?? Request.Cookies["refreshToken"];
+            var token = revokeTokenInput.RefreshToken ?? System.Net.WebUtility.UrlDecode(Request.Cookies["refreshToken"]);
 
             if (string.IsNullOrEmpty(token))
                 return BadRequest(new { message = "Token is required" });
@@ -76,14 +74,14 @@ namespace API.Controllers
             var response = _userAuthService.RevokeToken(token, ipAddress());
 
             if (!response)
-                return NotFound(new { message = "Token not found" });
+                return NotFound(new { message = "Token not found - " + token });
 
             return Ok(new { message = "Token revoked" });
         }
 
 
         [HttpGet]
-        [Authorize(Roles = "admin")]
+        [Authorize(RoleKey.admin, RoleKey.superuser)]
         public ActionResult<IEnumerable<ReadUserDTO>> Get()
         {
             var users = _userData.GetAll_exclude_deleted();
@@ -92,15 +90,21 @@ namespace API.Controllers
             return Ok(usersDTO);
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<ReadUserDTO> GetById(int id)
-        {
-            // only allow admins to access other user records
-            var currentUserId = int.Parse(User.Identity.Name);
-            if (id != currentUserId && !User.IsInRole("admin"))
-                return Forbid();
 
-            var user = _userData.Get(id);
+        [HttpGet("{id}")]
+        //[Authorize(RoleKey.admin)]
+        public ActionResult<ReadUserDTO> GetById(long id)
+        {
+
+            //if (UserDetails == null || id != UserDetails.Id && CheckIfUserHasAdminRole(UserDetails.Roles))
+            //    return Unauthorized(new { message = "Unauthorized" });
+
+            // only allow admins to access other user records
+            //var currentUserId = int.Parse(User.Identity.Name);
+            //if (id != currentUserId && !User.IsInRole("admin"))
+            //    return Forbid();
+
+            var user = _userData.GetById(id).Result;
 
             var userDTO = _mapper.Map<UserBaseDTO>(user);
             return Ok(userDTO);

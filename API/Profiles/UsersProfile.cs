@@ -11,6 +11,7 @@ namespace API.Profiles
             CreateMap<User, ReadUserDTO>();
             CreateMap<User, UserBaseDTO>();
             CreateMap<UserRefreshToken, UserRefreshTokenDTO>();
+            CreateMap<Role, RoleDTO>();
         }
     }
 }

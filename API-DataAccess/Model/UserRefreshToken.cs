@@ -19,13 +19,22 @@ namespace API_DataAccess.Model
         public bool IsExpired => DateTime.UtcNow >= Expires;
         public DateTime Created { get; set; }
         public string CreatedByIp { get; set; }
-        public DateTime? Revoked { get; set; }
+
+
+        private DateTime revoked = DateTime.MinValue;
+
+        public DateTime Revoked
+        {
+            get { return revoked; }
+            set { revoked = value; }
+        }
+
         public string RevokedByIp { get; set; }
         public string ReplacedByToken { get; set; }
 
         [Write(false)]
         [Computed]
-        public bool IsActive => Revoked == null && !IsExpired;
+        public bool IsActive => Revoked == DateTime.MinValue && !IsExpired;
 
 
         private DateTime createdAt = DateTime.UtcNow;
@@ -36,7 +45,7 @@ namespace API_DataAccess.Model
             set { createdAt = value; }
         }
 
-        private DateTime updatedAt;
+        private DateTime updatedAt = DateTime.UtcNow;
 
         public DateTime UpdatedAt
         {
@@ -44,15 +53,22 @@ namespace API_DataAccess.Model
             set { updatedAt = value; }
         }
 
-        public DateTime? DeletedAt
+
+        private DateTime deletedAt = DateTime.MinValue;
+
+        public DateTime DeletedAt
         {
-            get; set;
+            get { return deletedAt; }
+            set { deletedAt = value; }
         }
 
+        private bool isDeleted;
 
-        [Write(false)]
-        [Computed]
-        public bool IsDeleted => this.DeletedAt != null;
+        public bool IsDeleted
+        {
+            get { return isDeleted; }
+            set { isDeleted = value; }
+        }
 
 
         [Write(false)]

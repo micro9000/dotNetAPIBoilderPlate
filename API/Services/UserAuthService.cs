@@ -102,19 +102,19 @@ namespace API.Services
 
         // helper methods
 
-        private Claim[] GetUserClaims (User user)
-        {
-            List<Claim> claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Name, user.Id.ToString()));
-            claims.Add(new Claim(ClaimTypes.Email, user.Email));
+        //private Claim[] GetUserClaims (User user)
+        //{
+        //    List<Claim> claims = new List<Claim>();
+        //    claims.Add(new Claim("userId", user.Id.ToString()));
+        //    claims.Add(new Claim(ClaimTypes.Email, user.Email));
 
-            foreach (var role in user.Roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role.RoleKey));
-            }
+        //    foreach (var role in user.Roles)
+        //    {
+        //        claims.Add(new Claim(ClaimTypes.Role, role.RoleKey.ToString()));
+        //    }
 
-            return claims.ToArray();
-        }
+        //    return claims.ToArray();
+        //}
 
         private string generateJwtToken(User user)
         {
@@ -123,7 +123,7 @@ namespace API.Services
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(this.GetUserClaims(user)),
+                Subject = new ClaimsIdentity(new[] { new Claim("userId", user.Id.ToString()) }),
                 Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
