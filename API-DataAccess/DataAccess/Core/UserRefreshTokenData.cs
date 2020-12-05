@@ -71,21 +71,8 @@ namespace API_DataAccess.DataAccess.Core
 
         public List<UserRefreshToken> GetAllByUser(long userId)
         {
-            List< UserRefreshToken> results = new List<UserRefreshToken>();
-
             string query = @"SELECT * FROM UserRefreshTokens WHERE isDeleted=false AND userId=@UserId";
-
-            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
-            {
-                var tokens = conn.Query<UserRefreshToken>(query, new
-                        {
-                            UserId = userId
-                        }).ToList();
-
-                conn.Close();
-            }
-
-            return results;
+            return this.GetAll(query, new { UserId = userId });
         }
 
         public UserRefreshToken GetByUser(long userId)

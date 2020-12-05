@@ -81,7 +81,7 @@ namespace API.Controllers
 
 
         [HttpGet]
-        [Authorize(RoleKey.admin, RoleKey.superuser)]
+        [Authorize(RoleKey.admin)] // , RoleKey.superuser
         public ActionResult<IEnumerable<ReadUserDTO>> Get()
         {
             var users = _userData.GetAll_exclude_deleted();
@@ -92,21 +92,20 @@ namespace API.Controllers
 
 
         [HttpGet("{id}")]
-        //[Authorize(RoleKey.admin)]
-        public ActionResult<ReadUserDTO> GetById(long id)
+        [Authorize] //(RoleKey.admin) -> authorize lang since, i allowed namn ung normal user ma view ung details nya
+        public ActionResult<int> GetById(long id)
         {
-
-            //if (UserDetails == null || id != UserDetails.Id && CheckIfUserHasAdminRole(UserDetails.Roles))
-            //    return Unauthorized(new { message = "Unauthorized" });
+            if (UserDetails != null && id != UserDetails.Id && CheckIfUserHasAdminRole(UserDetails.Roles) == false)
+                return Unauthorized(new { message = "Unauthorized" });
 
             // only allow admins to access other user records
             //var currentUserId = int.Parse(User.Identity.Name);
             //if (id != currentUserId && !User.IsInRole("admin"))
             //    return Forbid();
 
-            var user = _userData.GetById(id).Result;
+            var user = _userData.GetById(id);
 
-            var userDTO = _mapper.Map<UserBaseDTO>(user);
+             var userDTO = _mapper.Map<UserBaseDTO>(user);
             return Ok(userDTO);
         }
 

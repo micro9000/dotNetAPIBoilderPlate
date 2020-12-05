@@ -9,6 +9,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper;
+using System.Data;
 
 namespace API_DataAccess.DataAccess.Internal
 {
@@ -73,10 +75,9 @@ namespace API_DataAccess.DataAccess.Internal
             return res;
         }
 
-        //public List<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        // 
+        // Get methods
+        //
 
         public TEntity Get(long id)
         {
@@ -89,6 +90,18 @@ namespace API_DataAccess.DataAccess.Internal
             return res;
         }
 
+
+        public TEntity GetFirstOrDefault(string query, object param)
+        {
+            TEntity result;
+            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
+            {
+                result = conn.QueryFirstOrDefault<TEntity>(query, param);
+                conn.Close();
+            }
+            return result;
+        }
+
         public List<TEntity> GetAll()
         {
             List<TEntity> res = new List<TEntity>();
@@ -99,6 +112,136 @@ namespace API_DataAccess.DataAccess.Internal
             }
             return res;
         }
+
+
+        public List<TEntity> GetAll(string query, CommandType cmdType = CommandType.Text)
+        {
+            List<TEntity> results = new List<TEntity>();
+
+            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
+            {
+                results = conn.Query<TEntity>(query, commandType: cmdType).ToList();
+                conn.Close();
+            }
+
+            return results;
+        }
+  
+        public List<TEntity> GetAll(string query, object p, CommandType cmdType = CommandType.Text)
+        {
+            List<TEntity> results = new List<TEntity>();
+
+            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
+            {
+                results = conn.Query<TEntity>(query, p, commandType: cmdType).ToList();
+                conn.Close();
+            }
+
+            return results;
+        }
+
+
+        public async Task<List<TEntity>> GetAllAsync(string query, CommandType cmdType = CommandType.Text)
+        {
+            List<TEntity> results = new List<TEntity>();
+
+            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
+            {
+                var res = await conn.QueryAsync<TEntity>(query, commandType: cmdType);
+                results = res.ToList();
+                conn.Close();
+            }
+
+            return results;
+        }
+
+        public async Task<List<TEntity>> GetAllAsync(string query, object p, CommandType cmdType = CommandType.Text)
+        {
+            List<TEntity> results = new List<TEntity>();
+
+            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
+            {
+                var res = await conn.QueryAsync<TEntity>(query, p, commandType: cmdType);
+                results = res.ToList();
+                conn.Close();
+            }
+
+            return results;
+        }
+
+
+        public List<T> GetAll<T>() where T : class
+        {
+            List<T> res = new List<T>();
+            using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
+            {
+                res = conn.GetAll<T>().ToList();
+                conn.Close();
+            }
+            return res;
+        }
+
+        public List<T> GetAll<T>(string query, CommandType cmdType = CommandType.Text) where T : class
+        {
+            List<T> results = new List<T>();
+
+            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
+            {
+                results = conn.Query<T>(query, commandType: cmdType).ToList();
+                conn.Close();
+            }
+
+            return results;
+        }
+
+        public List<T> GetAll<T>(string query, object p, CommandType cmdType = CommandType.Text) where T : class
+        {
+            List<T> results = new List<T>();
+
+            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
+            {
+                results = conn.Query<T>(query, p, commandType: cmdType).ToList();
+                conn.Close();
+            }
+
+            return results;
+        }
+
+        public async Task<List<T>> GetAllAsync<T>(string query, CommandType cmdType = CommandType.Text) where T : class
+        {
+            List<T> results = new List<T>();
+
+            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
+            {
+                var res = await conn.QueryAsync<T>(query, commandType: cmdType);
+                results = res.ToList();
+                conn.Close();
+            }
+
+            return results;
+        }
+
+        public async Task<List<T>> GetAllAsync<T>(string query, object p, CommandType cmdType = CommandType.Text) where T : class
+        {
+            List<T> results = new List<T>();
+
+            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
+            {
+                var res = await conn.QueryAsync<T>(query, p, commandType: cmdType);
+                results = res.ToList();
+                conn.Close();
+            }
+
+            return results;
+        }
+
+
+
+
+        //
+        // UPDATING methods
+        //
+
 
         public bool Update(TEntity entity)
         {
@@ -121,5 +264,7 @@ namespace API_DataAccess.DataAccess.Internal
             }
             return res;
         }
+
+       
     }
 }

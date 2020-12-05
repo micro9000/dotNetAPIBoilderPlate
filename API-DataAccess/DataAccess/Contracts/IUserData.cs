@@ -8,11 +8,10 @@ namespace API_DataAccess.DataAccess.Contracts
     public interface IUserData : IRepository<User>
     {
         User Login(string userName, string password);
-        Task<User> GetById(long id);
+        User GetById(long id);
 
         List<User> GetAll_exclude_deleted();
 
         List<Role> GetRoles(long userId);
-        List<Role> GetRolesAsync(long userId);
     }
 }

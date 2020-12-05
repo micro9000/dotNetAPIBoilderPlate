@@ -28,18 +28,8 @@ namespace API_DataAccess.DataAccess.Core
 
         public List<Role> GetAll_exclude_deleted()
         {
-            List<Role> results = new List<Role>();
-
             string query = @"SELECT * FROM Roles WHERE isDeleted=false";
-
-            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
-            {
-                results = conn.Query<Role>(query).ToList();
-
-                conn.Close();
-            }
-
-            return results;
+            return this.GetAll(query);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace API.Controllers
 
         protected bool CheckIfUserHasAdminRole(List<Role> roles)
         {
-            var userRoles = roles.Select(r => r.RoleKey);
+            var userRoles = roles.Select(r => r.RoleKey).ToArray();
             return userRoles.Contains(RoleKey.admin);
         }
 

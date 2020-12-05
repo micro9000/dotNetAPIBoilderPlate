@@ -51,6 +51,8 @@ INSERT INTO UserRoles (roleId, userId) VALUES (1,1), (2,1);
 ALTER TABLE UserRoles
 ADD COLUMN isDeleted BOOLEAN DEFAULT False;
 
+SELECT * FROM UserRoles;
+
 CREATE TABLE UserRefreshTokens (
 	id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     userId BIGINT NOT NULL,

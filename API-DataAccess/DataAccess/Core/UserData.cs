@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using API_DataAccess.SettingModel;
 using API_DataAccess.DataAccess.Contracts;
+using System.Data;
 
 namespace API_DataAccess.DataAccess.Core
 {
@@ -28,106 +29,72 @@ namespace API_DataAccess.DataAccess.Core
         }
 
 
-
         public User Login(string userName, string password)
         {
             User results = new User();
             string query = "SELECT * FROM Users WHERE isDeleted=false AND userName=@Username AND password=@Password";
 
-            using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
+            results = this.GetFirstOrDefault(query, new
             {
-                results = conn.QueryFirstOrDefault<User>(query,
-                    new
-                    {
-                        Username = userName,
-                        Password = password
-                    });
-                conn.Close();
-            }
-
+                Username = userName,
+                Password = password
+            });
+            
             this.GetUserRoles(results);
-
-            //if (results != null)
-            //{
-            //    var roles = this.GetRoles(results.Id);
-
-            //    foreach(var role in roles)
-            //    {
-            //        results.Roles.Add(role);
-            //    }
-            //}
 
             return results;
         }
 
 
-        public async Task<User> GetById (long id)
+        public User GetById (long id)
         {
             User results = new User();
             string query = "SELECT * FROM Users WHERE isDeleted=false AND id=@Id";
 
-            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
+            results = this.GetFirstOrDefault(query, new
             {
-                results = await conn.QueryFirstOrDefaultAsync<User>(query,
-                    new
-                    {
-                        Id = id
-                    });
-                conn.Close();
-            }
+                Id = id
+            });
 
             this.GetUserRoles(results);
 
             return results;
         }
 
+        public User GetByEmail(string email)
+        {
+            User results = new User();
+            string query = "SELECT * FROM Users WHERE isDeleted=false AND email=@Email";
 
+            results = this.GetFirstOrDefault(query, new
+            {
+                Email = email
+            });
+
+            this.GetUserRoles(results);
+
+            return results;
+        }
 
         public List<User> GetAll_exclude_deleted()
         {
-            List<User> results = new List<User>();
-
             string query = @"SELECT * FROM Users WHERE isDeleted=false";
-
-            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
-            {
-                results = conn.Query<User>(query).ToList();
-
-                conn.Close();
-            }
-
-            return results;
+            return this.GetAll(query);
         }
 
 
         public List<Role> GetRoles(long userId)
         {
-            List<Role> roles = new List<Role>();
-
-            string query = @"SELECT R.*
-                            FROM UserRoles AS UR
-                            JOIN Users AS U ON UR.userId=U.id
-                            JOIN Roles AS R ON UR.roleId=R.id
-                            WHERE UR.isDeleted=false AND R.isDeleted=false AND UR.userID=@UserId";
-
-            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
-            {
-                roles = conn.Query<Role>(query, 
-                new { 
-                    UserId = userId
-                }).ToList();
-
-                conn.Close();
-            }
-
-            return roles;
+            string query = "spGetUserRoles";
+            var results = this.GetAllAsync<Role>(query, new { UserId = userId }, CommandType.StoredProcedure).Result;
+            return results.ToList();
         }
 
         private void GetUserRoles(User user)
         {
             if (user != null)
             {
-                var roles = this.GetRolesAsync(user.Id);
+                var roles = this.GetRoles(user.Id);
 
                 foreach (var role in roles)
                 {
@@ -136,29 +103,25 @@ namespace API_DataAccess.DataAccess.Core
             }
         }
 
-        public List<Role> GetRolesAsync(long userId)
-        {
-            List<Role> roles = new List<Role>();
+        //public List<Role> GetRolesAsync(long userId)
+        //{
+        //    List<Role> roles = new List<Role>();
 
-            string query = @"SELECT R.*
-                            FROM UserRoles AS UR
-                            JOIN Users AS U ON UR.userId=U.id
-                            JOIN Roles AS R ON UR.roleId=R.id
-                            WHERE UR.isDeleted=false AND R.isDeleted=false AND UR.userID=@UserId";
+        //    string query = "spGetUserRoles";
 
-            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
-            {
-                roles = conn.QueryAsync<Role>(query,
-                new
-                {
-                    UserId = userId
-                }).Result.ToList();
+        //    using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
+        //    {
+        //        roles = conn.QueryAsync<Role>(query,
+        //        new
+        //        {
+        //            UserId = userId
+        //        }, commandType: CommandType.StoredProcedure).Result.ToList();
 
-                conn.Close();
-            }
+        //        conn.Close();
+        //    }
 
-            return roles;
-        }
+        //    return roles;
+        //}
 
     }
 }

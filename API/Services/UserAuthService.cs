@@ -4,6 +4,7 @@ using API_DataAccess.DataAccess.Contracts;
 using API_DataAccess.DataAccess.Core;
 using API_DataAccess.Model;
 using AutoMapper;
+using EmailService;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -24,16 +25,19 @@ namespace API.Services
         private readonly IUserRefreshTokenData _userRefreshTokenData;
         private readonly AuthenticationSettings _authenticationSettings;
         private readonly IMapper _mapper;
+        private readonly IEmailSender _emailSender;
 
         public UserAuthService(IUserData userData, 
                             IUserRefreshTokenData userRefreshTokenData,
                             IOptions<AuthenticationSettings> authenticationSettings, 
-                            IMapper mapper)
+                            IMapper mapper,
+                            IEmailSender _emailSender)
         {
-            _userData = userData;
-            _userRefreshTokenData = userRefreshTokenData;
-            _authenticationSettings = authenticationSettings.Value;
-            _mapper = mapper;
+            this._userData = userData;
+            this._userRefreshTokenData = userRefreshTokenData;
+            this._authenticationSettings = authenticationSettings.Value;
+            this._mapper = mapper;
+            this._emailSender = _emailSender;
         }
 
         public ReadUserDTO Authenticate(LoginDTO model, string ipAddress)
@@ -54,6 +58,21 @@ namespace API.Services
             userDTO.RefreshToken = refreshToken.Token;
 
             return userDTO;
+        }
+
+        public ReadUserDTO Create(CreateUserRequestDTO model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Delete(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ForgotPassword(ForgotPasswordRequestDTO model, string origin)
+        {
+            throw new NotImplementedException();
         }
 
         public ReadUserDTO RefreshToken(string token, string ipAddress)
@@ -83,6 +102,16 @@ namespace API.Services
             return userDTO;
         }
 
+        public void Register(RegisterUserRequestDTO model, string origin)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ResetPassword(ResetPasswordRequestDTO model)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool RevokeToken(string token, string ipAddress)
         {
             var refreshToken = _userRefreshTokenData.GetByToken(token);
@@ -97,6 +126,21 @@ namespace API.Services
             _userRefreshTokenData.Update(refreshToken);
 
             return true;
+        }
+
+        public ReadUserDTO Update(int id, UpdateUserRequestDTO model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ValidateResetToken(ValidateResetTokenRequestDTO model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void VerifyEmail(string token)
+        {
+            throw new NotImplementedException();
         }
 
 

@@ -23,5 +23,7 @@ namespace API.DTO.User
 
         public DateTime DeletedAt { get; set; }
 
+        public bool IsVerified { get; set; }
+
     }
 }
