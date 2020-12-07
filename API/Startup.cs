@@ -47,9 +47,16 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<DatabaseSettings>(Configuration.GetSection("DatabaseSettings"));
-            services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
+            
             var authenticationSettingsSection = Configuration.GetSection(nameof(AuthenticationSettings));
             services.Configure<AuthenticationSettings>(authenticationSettingsSection);
+
+            //services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
+            var smtpSettings = Configuration
+                                    .GetSection("SmtpSettings")
+                                    .Get<SmtpSettings>();
+            services.AddSingleton(smtpSettings);
+
             services.AddOptions();
 
 
@@ -80,11 +87,25 @@ namespace API
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IRoleData, RoleData>();
             services.AddScoped<IUserData, UserData>();
+            services.AddScoped<IUserRoleData, UserRoleData>();
             services.AddScoped<IUserRefreshTokenData, UserRefreshTokenData>();
+
+            
             services.AddScoped<IUserAuthService, UserAuthService>();
+            services.AddScoped<IUserService, UserService>();
 
 
             services.AddCors();
+            // Enable this if you need to restrict to specific origin
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy("default", builder =>
+            //    {
+            //        builder.WithOrigins("http: //127.0.0.1")
+            //        .AllowAnyHeader()
+            //        .AllowAnyMethod();
+            //    });
+            //});
             services.AddControllers();
 
             services.AddSwaggerGen(c =>
@@ -114,6 +135,9 @@ namespace API
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials());
+
+            // enable this if you enable the addCors section on ConfigureServices
+            //app.UseCors("default");
 
 
             app.UseMiddleware<ErrorHandlerMiddleware>();

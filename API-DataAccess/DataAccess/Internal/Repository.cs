@@ -42,6 +42,18 @@ namespace API_DataAccess.DataAccess.Internal
             return id;
         }
 
+
+        public long Add<T>(T entity) where T : class
+        {
+            long id = 0;
+            using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
+            {
+                id = conn.Insert(entity);
+                conn.Close();
+            }
+            return id;
+        }
+
         public long AddRange(IEnumerable<TEntity> entities)
         {
             long id = 0;
@@ -79,6 +91,17 @@ namespace API_DataAccess.DataAccess.Internal
         // Get methods
         //
 
+        public T GetValue<T>(string query)
+        {
+            T res;
+            using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
+            {
+                res = conn.ExecuteScalar<T>(query);
+                conn.Close();
+            }
+            return res;
+        }
+
         public TEntity Get(long id)
         {
             TEntity res;
@@ -90,17 +113,29 @@ namespace API_DataAccess.DataAccess.Internal
             return res;
         }
 
-
-        public TEntity GetFirstOrDefault(string query, object param)
+        public TEntity GetFirstOrDefault(string query, object param, CommandType cmdType = CommandType.Text)
         {
             TEntity result;
             using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
             {
-                result = conn.QueryFirstOrDefault<TEntity>(query, param);
+                result = conn.QueryFirstOrDefault<TEntity>(query, param, commandType: cmdType);
                 conn.Close();
             }
             return result;
         }
+
+
+        public T GetFirstOrDefault<T>(string query, object param, CommandType cmdType = CommandType.Text) where T : class
+        {
+            T result;
+            using (var conn = ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter))
+            {
+                result = conn.QueryFirstOrDefault<T>(query, param, commandType: cmdType);
+                conn.Close();
+            }
+            return result;
+        }
+
 
         public List<TEntity> GetAll()
         {
@@ -254,6 +289,18 @@ namespace API_DataAccess.DataAccess.Internal
             return res;
         }
 
+
+        public bool Update<T>(T entity) where T : class
+        {
+            bool res;
+            using (var conn = new WrappedDbConnection(ConnectionFactory.GetDBConnecton(this._connectionString, this._dbAdapter)))
+            {
+                res = conn.Update(entity);
+                conn.Close();
+            }
+            return res;
+        }
+
         public bool UpdateRange(IEnumerable<TEntity> entities)
         {
             bool res;
@@ -265,6 +312,6 @@ namespace API_DataAccess.DataAccess.Internal
             return res;
         }
 
-       
+
     }
 }

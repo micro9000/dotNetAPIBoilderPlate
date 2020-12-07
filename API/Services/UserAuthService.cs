@@ -1,20 +1,17 @@
 ﻿using API.DTO.User;
+using API.Helpers;
 using API.SettingModel;
 using API_DataAccess.DataAccess.Contracts;
-using API_DataAccess.DataAccess.Core;
 using API_DataAccess.Model;
 using AutoMapper;
-using EmailService;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using BC = BCrypt.Net.BCrypt;
 
 namespace API.Services
@@ -25,30 +22,29 @@ namespace API.Services
         private readonly IUserRefreshTokenData _userRefreshTokenData;
         private readonly AuthenticationSettings _authenticationSettings;
         private readonly IMapper _mapper;
-        private readonly IEmailSender _emailSender;
 
-        public UserAuthService(IUserData userData, 
+        public UserAuthService(IUserData userData,
                             IUserRefreshTokenData userRefreshTokenData,
                             IOptions<AuthenticationSettings> authenticationSettings, 
-                            IMapper mapper,
-                            IEmailSender _emailSender)
+                            IMapper mapper)
         {
             this._userData = userData;
             this._userRefreshTokenData = userRefreshTokenData;
             this._authenticationSettings = authenticationSettings.Value;
             this._mapper = mapper;
-            this._emailSender = _emailSender;
         }
 
         public ReadUserDTO Authenticate(LoginDTO model, string ipAddress)
         {
-            var user = this._userData.Login(model.UserName, model.Password);
-
-            if (user == null) return null;
+            var user = this._userData.GetByEmail(model.Email);
+            if (user == null || !user.IsVerified || !BC.Verify(model.Password, user.Password))
+            {
+                throw new AppException("Email or password is incorrect");
+            };
 
             // authentication successful so generate jwt and refresh tokens
-            var jwtToken = generateJwtToken(user);
-            var refreshToken = generateRefreshToken(ipAddress, user.Id);
+            var jwtToken = JwtToken.generateJwtToken(user, _authenticationSettings.Secret);
+            var refreshToken = JwtToken.generateRefreshToken(ipAddress, user.Id);
 
             // save refresh token
             _userRefreshTokenData.Add(refreshToken);
@@ -60,21 +56,7 @@ namespace API.Services
             return userDTO;
         }
 
-        public ReadUserDTO Create(CreateUserRequestDTO model)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Delete(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ForgotPassword(ForgotPasswordRequestDTO model, string origin)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public ReadUserDTO RefreshToken(string token, string ipAddress)
         {
             var refreshToken = _userRefreshTokenData.GetByToken(token);
@@ -83,7 +65,7 @@ namespace API.Services
             if (!refreshToken.IsActive) return null;
             if (refreshToken.UserData == null) return null;
 
-            var newRefreshToken = generateRefreshToken(ipAddress, refreshToken.UserId);
+            var newRefreshToken = JwtToken.generateRefreshToken(ipAddress, refreshToken.UserId);
             refreshToken.Revoked = DateTime.UtcNow;
             refreshToken.RevokedByIp = ipAddress;
             refreshToken.ReplacedByToken = newRefreshToken.Token;
@@ -93,23 +75,13 @@ namespace API.Services
             _userRefreshTokenData.Update(refreshToken);
 
             // generate new jwt
-            var jwtToken = generateJwtToken(refreshToken.UserData);
+            var jwtToken = JwtToken.generateJwtToken(refreshToken.UserData, this._authenticationSettings.Secret);
 
             var userDTO = _mapper.Map<ReadUserDTO>(refreshToken.UserData);
             userDTO.JwtToken = jwtToken;
             userDTO.RefreshToken = refreshToken.Token;
 
             return userDTO;
-        }
-
-        public void Register(RegisterUserRequestDTO model, string origin)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ResetPassword(ResetPasswordRequestDTO model)
-        {
-            throw new NotImplementedException();
         }
 
         public bool RevokeToken(string token, string ipAddress)
@@ -126,70 +98,6 @@ namespace API.Services
             _userRefreshTokenData.Update(refreshToken);
 
             return true;
-        }
-
-        public ReadUserDTO Update(int id, UpdateUserRequestDTO model)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ValidateResetToken(ValidateResetTokenRequestDTO model)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void VerifyEmail(string token)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        // helper methods
-
-        //private Claim[] GetUserClaims (User user)
-        //{
-        //    List<Claim> claims = new List<Claim>();
-        //    claims.Add(new Claim("userId", user.Id.ToString()));
-        //    claims.Add(new Claim(ClaimTypes.Email, user.Email));
-
-        //    foreach (var role in user.Roles)
-        //    {
-        //        claims.Add(new Claim(ClaimTypes.Role, role.RoleKey.ToString()));
-        //    }
-
-        //    return claims.ToArray();
-        //}
-
-        private string generateJwtToken(User user)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_authenticationSettings.Secret);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[] { new Claim("userId", user.Id.ToString()) }),
-                Expires = DateTime.UtcNow.AddMinutes(15),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
-
-        private UserRefreshToken generateRefreshToken(string ipAddress, long userId)
-        {
-            using (var rngCryptoServiceProvider = new RNGCryptoServiceProvider())
-            {
-                var randomBytes = new byte[64];
-                rngCryptoServiceProvider.GetBytes(randomBytes);
-                return new UserRefreshToken
-                {
-                    UserId = userId,
-                    Token = Convert.ToBase64String(randomBytes),
-                    Expires = DateTime.UtcNow.AddDays(7),
-                    Created = DateTime.UtcNow,
-                    CreatedByIp = ipAddress
-                };
-            }
         }
     }
 }

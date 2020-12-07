@@ -11,13 +11,18 @@ namespace API_DataAccess.DataAccess.Internal
     public interface IRepository<TEntity> where TEntity : class
 	{
 		long Add(TEntity entity);
+		long Add<T>(T entity) where T : class;
+
 		long AddRange(IEnumerable<TEntity> entities);
 
 
-
+		T GetValue<T>(string query);
 		TEntity Get(long id);
-		TEntity GetFirstOrDefault(string query, object param);
-		
+		TEntity GetFirstOrDefault(string query, object param, CommandType cmdType = CommandType.Text);
+
+		T GetFirstOrDefault<T>(string query, object param, CommandType cmdType = CommandType.Text) where T : class;
+
+
 		List<TEntity> GetAll();
 		List<TEntity> GetAll(string query, CommandType cmdType = CommandType.Text);
 		List<TEntity> GetAll(string query, object p, CommandType cmdType = CommandType.Text);
@@ -38,6 +43,7 @@ namespace API_DataAccess.DataAccess.Internal
 
 
 		bool Update(TEntity entity);
+		bool Update<T>(T entity) where T : class;
 
 		bool UpdateRange(IEnumerable<TEntity> entities);
 

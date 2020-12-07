@@ -19,14 +19,14 @@ namespace API_DataAccess.DataAccess.Core
         private DatabaseSettings _settings;
         private string _connectionString;
         private Enums.Adapter _dbAdapter;
-        private readonly IUserData _userData;
+        private readonly IUserRoleData _userRoleData;
 
-        public UserRefreshTokenData(IOptions<DatabaseSettings> dbOptions, IUserData userData) : base(dbOptions)
+        public UserRefreshTokenData(IOptions<DatabaseSettings> dbOptions, IUserRoleData userRoleData) : base(dbOptions)
         {
             this._settings = dbOptions.Value;
             this._connectionString = this._settings.Main.ConnectionString;
             this._dbAdapter = this._settings.Main.Adapter;
-            _userData = userData;
+            _userRoleData = userRoleData;
         }
 
 
@@ -45,7 +45,7 @@ namespace API_DataAccess.DataAccess.Core
                         {
                             if (U != null)
                             {
-                                var roles = _userData.GetRoles(U.Id);
+                                var roles = _userRoleData.GetRolesByUser(U.Id);
 
                                 foreach (var role in roles)
                                 {

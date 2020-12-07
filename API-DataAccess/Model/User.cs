@@ -75,6 +75,14 @@ namespace API_DataAccess.Model
             set { isVerified = value; }
         }
 
+        private DateTime verifiedAt = DateTime.MinValue;
+
+        public DateTime VerifiedAt
+        {
+            get { return verifiedAt; }
+            set { verifiedAt = value; }
+        }
+
         private string resetToken;
 
         public string ResetToken

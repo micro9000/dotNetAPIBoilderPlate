@@ -34,7 +34,7 @@ public class AuthorizeAttribute : Attribute, IAuthorizationFilter
         if (user == null || (_roles.Any() && this.CheckUserRoles(user.Roles) == false))
         {
             // not logged in or role not authorized
-            context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+            context.Result = new JsonResult(new { message = "Unauthorized - AuthorizeAttribute" }) { StatusCode = StatusCodes.Status401Unauthorized };
         }
     }
 }

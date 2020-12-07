@@ -6,10 +6,10 @@ namespace API_DataAccess.Model
     [Table("Roles")]
     public class Role
     {
-        private long id;
+        private int id;
 
         [Key]
-        public long Id
+        public int Id
         {
             get { return id; }
             set { id = value; }

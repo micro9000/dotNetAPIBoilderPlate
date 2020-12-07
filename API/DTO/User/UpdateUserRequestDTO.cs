@@ -9,27 +9,58 @@ namespace API.DTO.User
 {
     public class UpdateUserRequestDTO
     {
-        [Required]
-        public string Username { get; set; }
+        private string userName;
 
-        [Required]
-        public string FullName { get; set; }
+        public string Username
+        {
+            get { return userName; }
+            set { userName = this.replaceEmptyWithNull(value); }
+        }
 
-        [Required]
+
+        private string fullName;
+
+        public string FullName
+        {
+            get { return fullName; }
+            set { fullName = this.replaceEmptyWithNull(value); }
+        }
+
+
+        private string email;
+
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email
+        {
+            get { return email; }
+            set { email = this.replaceEmptyWithNull(value); }
+        }
 
-        [Required]
+
+        private string password;
+
         [MinLength(6)]
-        public string Password { get; set; }
+        public string Password
+        {
+            get { return password; }
+            set { password = this.replaceEmptyWithNull(value);}
+        }
 
-        [Required]
+
+        private string confirmPassword;
+
         [Compare("Password")]
-        public string ConfirmPassword { get; set; }
+        public string ConfirmPassword
+        {
+            get { return confirmPassword; }
+            set { confirmPassword = this.replaceEmptyWithNull(value); }
+        }
 
-        [Required]
-        [EnumDataType(typeof(RoleKey))]
-        public string[] Roles { get; set; }
 
+        private string replaceEmptyWithNull(string value)
+        {
+            // replace empty string with null to make field optional
+            return string.IsNullOrEmpty(value) ? null : value;
+        }
     }
 }

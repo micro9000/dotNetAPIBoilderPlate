@@ -17,32 +17,25 @@ namespace API_DataAccess.DataAccess.Core
 {
     public class UserData : Repository<User>, IUserData
     {
+        private readonly IUserRoleData _userRoleData;
         private DatabaseSettings _settings;
         private string _connectionString;
         private Enums.Adapter _dbAdapter;
 
-        public UserData(IOptions<DatabaseSettings> dbOptions) : base (dbOptions)
+        public UserData(IOptions<DatabaseSettings> dbOptions, IUserRoleData userRoleData) : base (dbOptions)
         {
             this._settings = dbOptions.Value;
             this._connectionString = this._settings.Main.ConnectionString;
             this._dbAdapter = this._settings.Main.Adapter;
+            this._userRoleData = userRoleData;
         }
 
 
-        public User Login(string userName, string password)
+        public long GetCount()
         {
-            User results = new User();
-            string query = "SELECT * FROM Users WHERE isDeleted=false AND userName=@Username AND password=@Password";
-
-            results = this.GetFirstOrDefault(query, new
-            {
-                Username = userName,
-                Password = password
-            });
-            
-            this.GetUserRoles(results);
-
-            return results;
+            string query = "SELECT COUNT(*) FROM Users WHERE isDeleted=false";
+            long count = this.GetValue<long>(query);
+            return count;
         }
 
 
@@ -76,25 +69,57 @@ namespace API_DataAccess.DataAccess.Core
             return results;
         }
 
+
+        public User GetByUsername(string username)
+        {
+            User results = new User();
+            string query = "SELECT * FROM Users WHERE isDeleted=false AND userName=@Username";
+
+            results = this.GetFirstOrDefault(query, new
+            {
+                Username = username
+            });
+
+            this.GetUserRoles(results);
+
+            return results;
+        }
+
+        public User GetByResetToken (string token)
+        {
+            User results = new User();
+            string query = "SELECT * FROM Users WHERE isDeleted=false AND resetToken=@ResetToken";
+
+            results = this.GetFirstOrDefault(query, new
+            {
+                ResetToken = token
+            });
+            return results;
+        }
+
+        public User GetByVerificationToken(string token)
+        {
+            User results = new User();
+            string query = "SELECT * FROM Users WHERE isDeleted=false AND verificationToken=@Token";
+
+            results = this.GetFirstOrDefault(query, new
+            {
+                Token = token
+            });
+            return results;
+        }
+
         public List<User> GetAll_exclude_deleted()
         {
             string query = @"SELECT * FROM Users WHERE isDeleted=false";
             return this.GetAll(query);
         }
 
-
-        public List<Role> GetRoles(long userId)
-        {
-            string query = "spGetUserRoles";
-            var results = this.GetAllAsync<Role>(query, new { UserId = userId }, CommandType.StoredProcedure).Result;
-            return results.ToList();
-        }
-
         private void GetUserRoles(User user)
         {
             if (user != null)
             {
-                var roles = this.GetRoles(user.Id);
+                var roles = this._userRoleData.GetRolesByUser(user.Id);
 
                 foreach (var role in roles)
                 {

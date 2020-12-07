@@ -20,22 +20,22 @@ namespace API
             .CreateLogger();
 
 
-            Log.Information("Starting up");
-            CreateHostBuilder(args).Build().Run();
+            //Log.Information("Starting up");
+            //CreateHostBuilder(args).Build().Run();
 
-            //try
-            //{
-            //    Log.Information("Starting up");
-            //    CreateHostBuilder(args).Build().Run();
-            //}
-            //catch (Exception ex)
-            //{
-            //    Log.Fatal(ex, "Application start-up failed");
-            //}
-            //finally
-            //{
-            //    Log.CloseAndFlush();
-            //}
+            try
+            {
+                Log.Information("Starting up");
+                CreateHostBuilder(args).Build().Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application start-up failed");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
 
         }
 

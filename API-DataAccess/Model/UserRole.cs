@@ -42,7 +42,7 @@ namespace API_DataAccess.Model
             set { createdAt = value; }
         }
 
-        private DateTime updatedAt;
+        private DateTime updatedAt = DateTime.UtcNow;
 
         public DateTime UpdatedAt
         {

@@ -11,14 +11,5 @@ namespace API.Services
         ReadUserDTO Authenticate(LoginDTO model, string ipAddress);
         ReadUserDTO RefreshToken(string token, string ipAddress);
         bool RevokeToken(string token, string ipAddress);
-
-        void Register(RegisterUserRequestDTO model, string origin);
-        void VerifyEmail(string token);
-        void ForgotPassword(ForgotPasswordRequestDTO model, string origin);
-        void ValidateResetToken(ValidateResetTokenRequestDTO model);
-        void ResetPassword(ResetPasswordRequestDTO model);
-        ReadUserDTO Create(CreateUserRequestDTO model);
-        ReadUserDTO Update(int id, UpdateUserRequestDTO model);
-        void Delete(int id);
     }
 }

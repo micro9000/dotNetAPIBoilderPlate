@@ -31,5 +31,11 @@ namespace API_DataAccess.DataAccess.Core
             string query = @"SELECT * FROM Roles WHERE isDeleted=false";
             return this.GetAll(query);
         }
+
+        public Role GetByKey (string roleKey)
+        {
+            string query = @"SELECT * FROM Roles WHERE isDeleted=false AND roleKey=@Key";
+            return this.GetFirstOrDefault(query, new { Key = roleKey });
+        }
     }
 }

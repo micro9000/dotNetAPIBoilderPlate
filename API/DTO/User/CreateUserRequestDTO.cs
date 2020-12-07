@@ -1,4 +1,5 @@
-﻿using API_DataAccess.Model;
+﻿using API.CustomAttributes;
+using API_DataAccess.Model;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.DTO.User
@@ -23,9 +24,9 @@ namespace API.DTO.User
         [Compare("Password")]
         public string ConfirmPassword { get; set; }
 
-        [Required]
-        [EnumDataType(typeof(RoleKey))]
-        public string[] Roles { get; set; }
+
+        [EnumDataTypeArray(typeof(RoleKey))]
+        public RoleKey[] Roles { get; set; }
 
     }
 }

@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.WebUtilities;
+using API.Helpers;
+using EmailService;
 
 namespace API.Controllers
 {
@@ -23,17 +25,24 @@ namespace API.Controllers
         private readonly ILogger<UsersController> _log;
         private readonly IMapper _mapper;
         private readonly IUserData _userData;
+        private readonly IUserService _userService;
         private readonly IUserAuthService _userAuthService;
+
+        SmtpSettings _smtpSettings;
 
         public UsersController(ILogger<UsersController> log,
                                 IMapper mapper,
                                 IUserData userData,
-                                IUserAuthService userAuthService)
+                                IUserService userService,
+                                IUserAuthService userAuthService,
+                                SmtpSettings smtpSettings)
         {
             _log = log;
             _userData = userData;
+            _userService = userService;
             _userAuthService = userAuthService;
             _mapper = mapper;
+            _smtpSettings = smtpSettings;
         }
 
         [HttpPost("authenticate")]
@@ -107,6 +116,113 @@ namespace API.Controllers
 
              var userDTO = _mapper.Map<UserBaseDTO>(user);
             return Ok(userDTO);
+        }
+
+        [HttpPost("register")]
+        public async Task<ActionResult<ReadUserDTO>> Register(RegisterUserRequestDTO model)
+        {
+            try
+            {
+                await _userService.Register(model, Request.Headers["origin"]);
+                return Ok(new { message = "Registration successful, please check your email for verification instructions" });
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+
+        }
+
+        [HttpPost("verify-email")]
+        public ActionResult VerifyEmail(VerifyEmailRequestDTO model)
+        {
+            _userService.VerifyEmail(model.Token);
+            return Ok(new { message = "Verification successful, you can now login" });
+        }
+
+        [Authorize(RoleKey.admin)]
+        [HttpPost("create")]
+        public ActionResult<ReadUserDTO> Create(CreateUserRequestDTO model)
+        {
+            try
+            {
+                var user = _userService.Create(model);
+                return Ok(user);
+            }
+            catch(AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            
+        }
+
+        [Authorize(RoleKey.admin)]
+        [HttpPut("update/{id:int}")]
+        public ActionResult<ReadUserDTO> Update(long id, UpdateUserRequestDTO model)
+        {
+            try
+            {
+                var user = _userService.Update(id, model);
+                return Ok(user);
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<ActionResult> ForgotPassword (ForgotPasswordRequestDTO model)
+        {
+            await _userService.ForgotPassword(model, Request.Headers["origin"]);
+            return Ok(new { message = $"Please check your email for password reset instructions {_smtpSettings.EmailFrom}" });
+        }
+
+
+        [HttpPost("validate-reset-token")]
+        public ActionResult ValidateResetToken(ValidateResetTokenRequestDTO model)
+        {
+            try
+            {
+                if (_userService.ValidateResetToken(model))
+                    return Ok(new { message = "Token is valid" });
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            return BadRequest(new { message = "Invalid token" });
+        }
+
+        [HttpPost("reset-password")]
+        public ActionResult ResetPassword(ResetPasswordRequestDTO model)
+        {
+            try
+            {
+                if (_userService.ResetPassword(model))
+                    return Ok(new { message = "Password reset successful, you can now login" });
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            return BadRequest(new { message = "Invalid token" });
+        }
+
+        [Authorize(RoleKey.admin)]
+        [HttpDelete("delete/{id:int}")]
+        public ActionResult Delete(long id)
+        {
+            try
+            {
+                _userService.Delete(id);
+                return Ok(new { message = "Account deleted successfully" });
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         // helper methods

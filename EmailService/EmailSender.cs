@@ -1,5 +1,4 @@
 ﻿using MailKit.Net.Smtp;
-using Microsoft.Extensions.Options;
 using MimeKit;
 using System;
 using System.IO;
@@ -12,19 +11,23 @@ namespace EmailService
     {
         private readonly SmtpSettings _smtpSettings;
 
-        public EmailSender(IOptions<SmtpSettings> smtpSettings)
+        public EmailSender(SmtpSettings smtpSettings)
         {
-            _smtpSettings = smtpSettings.Value;
+            _smtpSettings = smtpSettings;
         }
 
         public void SendEmail(Message message)
         {
-            throw new NotImplementedException();
+            var emailMessage = CreateEmailMessage(message);
+
+            Send(emailMessage);
         }
 
-        public Task SendEmailAsync(Message message)
+        public async Task SendEmailAsync(Message message)
         {
-            throw new NotImplementedException();
+            var mailMessage = CreateEmailMessage(message);
+
+            await SendAsync(mailMessage);
         }
 
 
