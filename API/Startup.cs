@@ -39,6 +39,7 @@ namespace API
                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                         .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                         .AddEnvironmentVariables()
+                        .AddUserSecrets<Program>()
                         .Build();
         }
 
