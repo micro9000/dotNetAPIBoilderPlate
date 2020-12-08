@@ -20,7 +20,7 @@ namespace API_DataAccess.DataAccess.Core
         private readonly IUserRoleData _userRoleData;
         private DatabaseSettings _settings;
         private string _connectionString;
-        private Enums.Adapter _dbAdapter;
+        private Enums.DatabaseAdapter _dbAdapter;
 
         public UserData(IOptions<DatabaseSettings> dbOptions, IUserRoleData userRoleData) : base (dbOptions)
         {

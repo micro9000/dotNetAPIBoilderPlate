@@ -8,7 +8,7 @@ namespace API_DataAccess.SettingModel
 {
     public static class Enums
     {
-        public enum Adapter
+        public enum DatabaseAdapter
         {
             sqlconnection,
             sqlceconnection,

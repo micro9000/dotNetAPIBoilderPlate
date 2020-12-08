@@ -23,6 +23,7 @@ using API_DataAccess.SettingModel;
 using API_DataAccess.DataAccess.Contracts;
 using EmailService;
 using API.Middleware;
+//using System.Data.SqlClient;
 
 namespace API
 {
@@ -46,6 +47,18 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            // Secret Manager tool
+            // dotnet user-secrets set "DbPassword" "pass123" and connectionstring in secret.js in Manage User Secrets
+            //var databaseSettingsSection = Configuration
+            //                                    .GetSection(nameof(DatabaseSettings))
+            //                                    .Get<DatabaseSettings>();
+            //var sqlConnStringBuilder = new SqlConnectionStringBuilder(databaseSettingsSection.Main.ConnectionString);
+            //sqlConnStringBuilder.Password = Configuration["DbPassword"];
+            //databaseSettingsSection.Main.ConnectionString = sqlConnStringBuilder.ConnectionString;
+            //services.AddSingleton(databaseSettingsSection);
+
+
             services.Configure<DatabaseSettings>(Configuration.GetSection("DatabaseSettings"));
             
             var authenticationSettingsSection = Configuration.GetSection(nameof(AuthenticationSettings));

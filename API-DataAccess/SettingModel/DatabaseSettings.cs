@@ -10,7 +10,7 @@ namespace API_DataAccess.SettingModel
     public class ApplicationDBConnectionSettings
     {
         public string ConnectionString { get; set; }
-        public Enums.Adapter Adapter { get; set; }
+        public Enums.DatabaseAdapter Adapter { get; set; }
     }
 
     public class DatabaseSettings

@@ -15,7 +15,7 @@ namespace API_DataAccess.Internal
     public static class ConnectionFactory
     {
 
-        public static DbConnection GetDBConnecton (string connectionString, Enums.Adapter adapter)
+        public static DbConnection GetDBConnecton (string connectionString, Enums.DatabaseAdapter adapter)
         {
             DbConnection connection = new MySqlConnection(connectionString);
 
@@ -25,11 +25,11 @@ namespace API_DataAccess.Internal
             }
 
             switch (adapter) {
-                case Enums.Adapter.sqlconnection:
+                case Enums.DatabaseAdapter.sqlconnection:
                     connection = new SqlConnection(connectionString);
                     break;
 
-                case Enums.Adapter.npgsqlconnection:
+                case Enums.DatabaseAdapter.npgsqlconnection:
                     connection = new OracleConnection(connectionString);
                     break;
                 default:

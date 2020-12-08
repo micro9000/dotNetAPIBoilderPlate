@@ -18,7 +18,7 @@ namespace API_DataAccess.DataAccess.Core
 
         private DatabaseSettings _settings;
         private string _connectionString;
-        private Enums.Adapter _dbAdapter;
+        private Enums.DatabaseAdapter _dbAdapter;
         private readonly IUserRoleData _userRoleData;
 
         public UserRefreshTokenData(IOptions<DatabaseSettings> dbOptions, IUserRoleData userRoleData) : base(dbOptions)

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
+//https: //code-maze.com/send-email-with-attachments-aspnetcore-2/
 namespace EmailService
 {
     public class EmailSender : IEmailSender

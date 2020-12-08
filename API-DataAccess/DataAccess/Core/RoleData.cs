@@ -17,7 +17,7 @@ namespace API_DataAccess.DataAccess.Core
     {
         private DatabaseSettings _settings;
         private string _connectionString;
-        private Enums.Adapter _dbAdapter;
+        private Enums.DatabaseAdapter _dbAdapter;
 
         public RoleData(IOptions<DatabaseSettings> dbOptions) : base(dbOptions)
         {

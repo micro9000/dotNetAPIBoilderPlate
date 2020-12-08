@@ -19,7 +19,7 @@ namespace API_DataAccess.DataAccess.Internal
 
         private DatabaseSettings _settings;
         private string _connectionString;
-        private Enums.Adapter _dbAdapter;
+        private Enums.DatabaseAdapter _dbAdapter;
 
         public Repository(IOptions<DatabaseSettings> dbOptions)
         {
