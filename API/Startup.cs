@@ -23,16 +23,20 @@ using API_DataAccess.SettingModel;
 using API_DataAccess.DataAccess.Contracts;
 using EmailService;
 using API.Middleware;
+using Microsoft.AspNetCore.Http;
 //using System.Data.SqlClient;
 
 namespace API
 {
     public class Startup
     {
+        private readonly IWebHostEnvironment _env;
+
         // https: //andrewlock.net/ihostingenvironment-vs-ihost-environment-obsolete-types-in-net-core-3/
         //IWebHostEnvironment IHostEnvironment
         public Startup(IWebHostEnvironment env)
         {
+            _env = env;
             //Configuration = configuration;
             Configuration = new ConfigurationBuilder()
                         .SetBasePath(env.ContentRootPath)
@@ -48,6 +52,14 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            if (!_env.IsDevelopment())
+            {
+                services.AddHttpsRedirection(options =>
+                {
+                    options.RedirectStatusCode = StatusCodes.Status308PermanentRedirect;
+                    options.HttpsPort = 443;
+                });
+            }
 
             // Secret Manager tool
             // dotnet user-secrets set "DbPassword" "pass123" and connectionstring in secret.js in Manage User Secrets
@@ -130,13 +142,17 @@ namespace API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            if (_env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SecureAPI v1"));
+            }
+            else
+            {
+                app.UseHsts();
             }
 
             app.UseHttpsRedirection();
